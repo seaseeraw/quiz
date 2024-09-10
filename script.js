@@ -161,6 +161,9 @@
 // }
 
 
+const QUIZ_QUESTION_POINTS = 1; // Points per question
+const PASS_PERCENT = 50; // Passing percentage
+
 const QUIZ_TIME = 100;
 let currentQuestionIndex = 0; 
 let timer= 0;
@@ -182,12 +185,7 @@ function showModule(moduleName) {
     });
 }
 
-// function startQuiz() {
-//     showModule("quiz-module");
-//     currentQuestionIndex = 0;
-//     showQuestion(); // Display the first question
-//     startTimer(); // Start the timer
-// }
+
 
 function startQuiz() {
     showModule("quiz-module");
@@ -198,56 +196,91 @@ function startQuiz() {
 
 function startTimer() {
     const timerElement = document.getElementById("timer");
+     const sound = document.getElementById("timerAudio");
     timer = QUIZ_TIME;
     setInterValId = setInterval(() => {
+        sound.play();
         timerElement.innerText = timer;
         timer -= 1;
         if (timer < 0) {
+            
             stopQuiz();
         }
     }, 1000);
 }
 
+
+const questionObj = quiz[currentQuestionIndex];
+
 function showQuestion() {
-    const questionObj = quiz[currentQuestionIndex];
     const quizList = document.getElementById("quizList");
-        quizList.innerHTML = '';
-        const questionList = document.createElement("li");
-   questionList.classList.add("quiz-question");
-   const questionSpan = document.createElement("span");
-    questionSpan.innerText = `Question ${currentQuestionIndex + 1}: ${questionObj.question}`;
+    quizList.innerHTML = ''; 
 
-    const optionsUL = document.createElement("ul");
-    optionsUL.classList.add("quiz-answer");
+    quiz.forEach((questionObj, questionIndex) => {
+        const questionItem = document.createElement("li");
+        const questionSpan = document.createElement("span");
+        questionSpan.innerText = `Question ${questionIndex + 1}: ${questionObj.question}`;
+        questionItem.appendChild(questionSpan);
 
-    questionObj.options.forEach((option, optionIndex) => {
-        const optionList = document.createElement("li");
+        const optionsUL = document.createElement("ul");
 
-        const inputElement = document.createElement("input");
-        inputElement.id = `q-${currentQuestionIndex}-a-${optionIndex}`;
-        inputElement.type = "radio";
-        inputElement.name = `question-${currentQuestionIndex}`;
+        questionObj.options.forEach((option, optionIndex) => {
+            const optionLI = document.createElement("li");
 
-        const inputLabel = document.createElement("label");
-        inputLabel.setAttribute("for", inputElement.id);
-        inputLabel.innerText = option;
+            const inputElement = document.createElement("input");
+            inputElement.id = `q-${questionIndex}-a-${optionIndex}`;
+            inputElement.type = "radio";
+            inputElement.name = `question-${questionIndex}`;
 
-        optionList.append(inputElement);
-        optionList.append(inputLabel);
-        optionsUL.append(optionList);
+            const inputLabel = document.createElement("label");
+            inputLabel.setAttribute("for", inputElement.id);
+            inputLabel.innerText = option;
+
+            optionLI.appendChild(inputElement);
+            optionLI.appendChild(inputLabel);
+            optionsUL.appendChild(optionLI);
+        });
+
+        questionItem.appendChild(optionsUL);
+        quizList.appendChild(questionItem);
+    });
+}
+
+
+function calculateResult() {
+    const selectedOptionList = document.querySelectorAll('input[type="radio"]:checked');
+    let score = 0; 
+
+    selectedOptionList.forEach(item => {
+        
+        const [ , questionIndex, , ] = item.id.split("-").map(Number);
+
+     
+        const selectedAnswer = document.querySelector(`label[for="${item.id}"]`).innerText;
+
+        
+        if (quiz[questionIndex] && selectedAnswer === quiz[questionIndex].answer) {
+            score += QUIZ_QUESTION_POINTS; 
+        }
     });
 
-    questionList.append(questionSpan);
-    questionList.append(optionsUL);
-    quizList.append(questionList);
+    
+    const resultPercent = (score / quiz.length) * 100;
+    const result = resultPercent >= PASS_PERCENT ? "PASSED" : "FAILED";
 
+    
+    document.getElementById("score").innerText = `Score: ${score}`;
+    document.getElementById("result").innerText = `Result: ${result}`;
 }
+
+
 showQuestion();
+
 
 function stopQuiz() {
     clearInterval(setInterValId);
     showModule("score-module");
-    // calculateResult();
+    calculateResult();
 }
 
 function resetQuiz() {
@@ -255,3 +288,9 @@ function resetQuiz() {
     document.getElementById("timer").innerText = "--";
     showModule("start-module");
 }
+
+
+
+
+
+
