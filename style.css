@@ -13,9 +13,12 @@ body {
     max-width: 800px;
     margin: 0 auto;
     padding: 20px;
-    background-image: url(./a.png);
+    /* background-image: url(./a.png);
     background-repeat: no-repeat;
-    background-size: cover;
+    background-size: cover; */
+    background: rgb(2,0,36);
+background: linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(255,0,202,1) 48%, rgba(9,9,121,1) 82%);
+ 
     min-height: 50vh;
    
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
