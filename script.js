@@ -449,10 +449,10 @@ function stopQuiz() {
 
 function resetQuiz() {
     clearInterval(setInterValId);
-    document.getElementById("timer").innerText = "--";
+    document.getElementById("timer").innerText ="--";
     showModule("start-module");
-    userAnswers = []; // Clear previous answers
+    userAnswers = []; 
 }
-
+console.log(resetQuiz());
 
 
